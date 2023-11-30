@@ -16,4 +16,4 @@ spec:
         - name: ms2
           image: mayuratverticurl/weatherms2:latest
           ports:
-            - containerPort: 3002
+            - containerPort: 3000
