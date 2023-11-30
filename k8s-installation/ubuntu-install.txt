@@ -1,0 +1,100 @@
+# Using UBUNTU for k8s v1.26*
+
+top src : https://www.cherryservers.com/blog/install-kubernetes-on-ubuntu
+main src & Weave : https://achchusnulchikam.medium.com/installation-simple-kubernetes-cluster-on-ubuntu-server-20-04-91e4868558b7
+
+#updating Hostname
+- hostnamectl set-hostname kmaster
+- hostnamectl set-hostname kworker
+
+#Update the /etc/hosts and check pinging
+- 172.31.86.127    kmaster
+- 172.31.84.153    kworker
+
+
+#BOTH Turn of the SWAP
+- sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab    # (permanently)
+- swapoff -a #temporary (non reboot)
+turn off permanently Src: https://pimylifeup.com/ubuntu-turn-off-swap/
+
+
+
+#BOTH #updating the packages & installing DOCKER
+src : https://docs.docker.com/engine/install/ubuntu/
+
+- sudo apt update && sudo apt -y full-upgrade
+- curl -fsSL https://get.docker.com -o get-docker.sh 
+- sudo sh get-docker.sh
+- check status and enable docker
+
+
+
+#BOTH #letting IPTABLES see bridge traffics
+
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+----
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+----
+sudo sysctl --system
+
+
+
+#BOTH #installing KUBEADM, KUBECTL, KUBELET #version 1.26*
+src : top
+
+- sudo mkdir -m 755 /etc/apt/keyrings
+- curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+- echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.24/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+- sudo apt-get update
+- sudo apt-get install -y kubelet kubeadm kubectl
+
+
+#BOTH #configure containerd dor runtime
+- sudo mkdir /etc/containerd
+- sudo sh -c "containerd config default > /etc/containerd/config.toml"
+- sudo sed -i 's/ SystemdCgroup = false/ SystemdCgroup = true/' /etc/containerd/config.toml
+- sudo systemctl restart containerd.service
+- sudo systemctl restart kubelet.service
+- sudo systemctl enable kubelet.service
+
+
+#MASTER #init KUBEADM
+src: top
+- sudo kubeadm config images pull
+- sudo kubeadm init --pod-network-cidr=172.31.0.0/16 #give the private ip / subnet
+
+#MASTER # configuring kubectl
+- mkdir -p $HOME/.kube
+- sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+- sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+- kubectl get nodes
+
+#MASTER # configuring Calico Network Plugin
+src: top
+- kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
+- curl https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml -O
+
+# change the cidr as we gave before
+- sed -i 's/cidr: 192\.168\.0\.0\/16/cidr: 172.31.0.0\/16/g' custom-resources.yaml   
+- kubectl create -f custom-resources.yaml
+
+
+################# IF ANY CONFIG PROBLEM ###################
+#BOTH reset the kubeadm
+- kubeadm reset 
+- rm -rf .kube 
+###########################################################
+
+################# - NOTE - check for pod PROBLEM ##########
+- kubectl get pods -n kube-system
+- kubectl delete pods -n kube-system <pod name>
+###########################################################
+
+

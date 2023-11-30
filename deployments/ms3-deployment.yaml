@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms3
+  template:
+    metadata:
+      labels:
+        app: ms3
+    spec:
+      containers:
+        - name: ms3
+          image: mayuratverticurl/weatherms3:latest
+          ports:
+            - containerPort: 3000
+            # Elastic IP's of the Other 2 services should be provided
+          env:
+            - name: MS1_URL
+              value: "http://ms1-service"
+            - name: MS2_URL
+              value: "http://ms2-service"
