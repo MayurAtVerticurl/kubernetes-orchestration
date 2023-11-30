@@ -13,7 +13,7 @@ spec:
         app: ms2
     spec:
       containers:
-        - name: ms1
-          image: mayuratverticurl/weatherms1:latest
+        - name: ms2
+          image: mayuratverticurl/weatherms2:latest
           ports:
             - containerPort: 3002
