@@ -19,7 +19,7 @@ spec:
             - containerPort: 3000
             # Elastic IP's of the Other 2 services should be provided
           env:
-            - name: MS1_URL
+            - name: ms1URL
               value: "http://ms1-service"
-            - name: MS2_URL
+            - name: ms2URL
               value: "http://ms2-service"
