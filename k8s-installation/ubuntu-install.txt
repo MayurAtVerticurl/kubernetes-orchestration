@@ -8,8 +8,8 @@ main src & Weave : https://achchusnulchikam.medium.com/installation-simple-kuber
 - hostnamectl set-hostname kworker
 
 #Update the /etc/hosts and check pinging
-- 172.31.86.127    kmaster
-- 172.31.84.153    kworker
+- 172.31.94.145    kmaster
+- 172.31.84.176    kworker
 
 
 #BOTH Turn of the SWAP
@@ -49,10 +49,10 @@ src : top
 
 - sudo mkdir -m 755 /etc/apt/keyrings
 - curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
-- echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.24/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+- echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 - sudo apt-get update
-- sudo apt-get install -y kubelet kubeadm kubectl
+- sudo apt install -y kubelet=1.26.5-00 kubeadm=1.26.5-00 kubectl=1.26.5-00
 
 
 #BOTH #configure containerd dor runtime
@@ -67,7 +67,7 @@ src : top
 #MASTER #init KUBEADM
 src: top
 - sudo kubeadm config images pull
-- sudo kubeadm init --pod-network-cidr=172.31.0.0/16 #give the private ip / subnet
+- sudo kubeadm init       #additional      --pod-network-cidr=172.31.0.0/16 #give the private ip / subnet
 
 #MASTER # configuring kubectl
 - mkdir -p $HOME/.kube
@@ -76,6 +76,7 @@ src: top
 
 - kubectl get nodes
 
+######################     DONT USE    ######################################
 #MASTER # configuring Calico Network Plugin
 src: top
 - kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
@@ -84,7 +85,16 @@ src: top
 # change the cidr as we gave before
 - sed -i 's/cidr: 192\.168\.0\.0\/16/cidr: 172.31.0.0\/16/g' custom-resources.yaml   
 - kubectl create -f custom-resources.yaml
+########################################################################################
 
+
+-----------------------------USE WEAVE ---------------------------------------------
+#MASTER # configuring Weave Network Plugin
+src : https://www.weave.works/docs/net/latest/kubernetes/kube-addon/
+
+- kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+
+-------------------------------------------------------------------------------------
 
 ################# IF ANY CONFIG PROBLEM ###################
 #BOTH reset the kubeadm
