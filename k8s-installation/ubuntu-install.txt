@@ -97,7 +97,7 @@ src : https://www.weave.works/docs/net/latest/kubernetes/kube-addon/
 -------------------------------------------------------------------------------------
 
 ################# IF ANY CONFIG PROBLEM ###################
-#BOTH reset the kubeadm
+#BOTH reset the kubeadm and delete the .kube from 
 - kubeadm reset 
 - rm -rf .kube 
 ###########################################################

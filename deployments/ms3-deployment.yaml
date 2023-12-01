@@ -17,7 +17,13 @@ spec:
           image: mayuratverticurl/weatherms3:latest
           ports:
             - containerPort: 3000
-            # Elastic IP's of the Other 2 services should be provided
+          resources:
+            limits:
+              cpu: "100m" # 100 milliCPU units (half of 200m)
+              memory: "128Mi" # 128 Mebibytes (half of 256Mi)
+            requests:
+              cpu: "50m" # 50 milliCPU units (half of 100m)
+              memory: "64Mi" # 64 Mebibytes (half of 128Mi)
           env:
             - name: ms1URL
               value: "http://ms1-service"

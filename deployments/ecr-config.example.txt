@@ -1,0 +1,13 @@
+docker tag weatherms1:v2 267092042432.dkr.ecr.us-east-1.amazonaws.com/mayur-k8s-repo:v2
+
+
+uri : 267092042432.dkr.ecr.us-east-1.amazonaws.com/mayur-k8s-repo:v2
+
+// secret creation - check docs
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 267092042432.dkr.ecr.us-east-1.amazonaws.com
+
+kubectl create secret docker-registry ecr-secret --docker-server=267092042432.dkr.ecr.us-east-1.amazonaws.com --docker-username=AWS --docker-password=$(aws ecr get-login-password --region us-east-1) --docker-email=dummy@example.com
+
+//Constant load on the service to see HPA
+
+kubectl run -i --tty load-generator --rm --image=busybox --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://ms3-service; done"

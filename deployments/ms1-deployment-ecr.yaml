@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms1
+  template:
+    metadata:
+      labels:
+        app: ms1
+    spec:
+      containers:
+        - name: ms1
+          image: 267092042432.dkr.ecr.us-east-1.amazonaws.com/mayur-k8s-repo:v2
+          ports:
+            - containerPort: 3000
+            #use secrets for ECR , create it
+      imagePullSecrets:
+        - name: ecr-secret
