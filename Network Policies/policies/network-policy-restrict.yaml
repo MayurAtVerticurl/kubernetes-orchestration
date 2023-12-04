@@ -1,0 +1,10 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: default-deny-ms3
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: ms3
+  ingress: []

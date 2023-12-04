@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms1
+  namespace: ns2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms2
+  template:
+    metadata:
+      labels:
+        app: ms2
+    spec:
+      containers:
+        - name: ms2
+          image: mayuratverticurl/weatherms2:latest
+          ports:
+            - containerPort: 3000

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms3
+  namespace: ns3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms3
+  template:
+    metadata:
+      labels:
+        app: ms3
+    spec:
+      containers:
+        - name: ms3
+          image: mayuratverticurl/weatherms3:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: ms1URL
+              value: "http://ms1-service.ns1.svc.cluster.local" # FQDN for ms1-service in ns1
+            - name: ms2URL
+              value: "http://ms2-service.ns2.svc.cluster.local" # FQDN for ms2-service in ns2
