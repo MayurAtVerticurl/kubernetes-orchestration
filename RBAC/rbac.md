@@ -39,7 +39,6 @@ This Guide is for RBAC in kubernetes
 	`kubectl config use-context mayur-kube`
 
 
-## Creating a Role & Role Binding
 resources are in the same folder
 -  ### Create a Role & Apply
 
@@ -47,4 +46,3 @@ resources are in the same folder
 
 -  ### Create a Role Binding to Attach & Apply
 		kubectl apply -f read-role-binding.yaml
-
