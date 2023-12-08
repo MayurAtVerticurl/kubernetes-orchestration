@@ -107,4 +107,6 @@ src : https://www.weave.works/docs/net/latest/kubernetes/kube-addon/
 - kubectl delete pods -n kube-system <pod name>
 ###########################################################
 
-
+Taint a node (Allowing a node to deploy pods on it)
+- kubectl get pods
+- kubectl taint node <name of node> node-role.kubernetes.io/control-plane:NoSchedule-
